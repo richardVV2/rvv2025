@@ -1,149 +1,36 @@
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <title>Control Remoto del Sistema</title>
+  <meta charset="UTF-8">
+  <title>Control</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f4f4;
-      text-align: center;
-      padding: 40px;
-    }
-
-    h1 {
-      color: #222;
-    }
-
-    .btn {
-      display: inline-block;
-      font-size: 18px;
-      padding: 15px 30px;
-      margin: 10px;
+    body { text-align: center; padding-top: 40px; font-family: sans-serif; background: #f0f0f0; }
+    button {
+      font-size: 26px;
+      margin: 20px;
+      padding: 20px 40px;
+      width: 80%;
+      max-width: 400px;
       border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: all 0.3s ease;
+      border-radius: 8px;
+      background-color: #0078D7;
       color: white;
-      background-color: #0078d7;
     }
-
-    .btn:hover {
-      background-color: #005a9e;
-    }
-
-    #btnF12 {
-      background-color: gold;
-      color: black;
-      font-weight: bold;
-    }
-
-    #btnF11 {
-      background-color: orange;
-      font-weight: bold;
-    }
-
-    .btn-row {
-      margin: 15px 0;
-    }
-
-    #login-section {
-      margin-top: 50px;
-    }
-
-    #control-section {
-      display: none;
-    }
-
-    #clave {
-      padding: 10px;
-      font-size: 18px;
-      width: 200px;
-      text-align: center;
-    }
-
-    #btnAcceder {
-      padding: 10px 20px;
-      font-size: 16px;
-      margin-top: 15px;
-    }
-
-    #error-clave {
-      color: red;
-      margin-top: 10px;
-      display: none;
-    }
+    button:hover { background-color: #005a9e; }
   </style>
 </head>
 <body>
-  <h1>Control Remoto del Sistema</h1>
-
-  <!-- 🔐 Sección de login -->
-  <div id="login-section">
-    <p>Ingrese la clave de acceso:</p>
-    <input type="password" id="clave" placeholder="Clave" />
-    <br />
-    <button class="btn" id="btnAcceder" onclick="verificarClave()">Acceder</button>
-    <p id="error-clave">❌ Clave incorrecta</p>
-  </div>
-
-  <!-- ✅ Sección de control (inicialmente oculta) -->
-  <div id="control-section">
-    <div class="btn-row">
-      <button class="btn" onclick="enviarComando('volumen_up')">🔊 Volumen +</button>
-      <button class="btn" onclick="enviarComando('volumen_down')">🔉 Volumen -</button>
-    </div>
-
-    <div class="btn-row">
-      <button class="btn" onclick="enviarComando('f4')">F4</button>
-      <button class="btn" onclick="enviarComando('f5')">F5</button>
-      <button class="btn" onclick="enviarComando('f10')">F10</button>
-    </div>
-
-    <div class="btn-row">
-      <button class="btn" id="btnF12" onclick="enviarComando('f12')">🎯 F12 - Atrapar foco</button>
-      <button class="btn" id="btnF11" onclick="enviarComando('f11')">🟡 F11 - Devolver foco</button>
-    </div>
-  </div>
+  <h1>Control Remoto</h1>
+  <button onclick="comando('volumen_up')">🔊 Volumen +</button><br>
+  <button onclick="comando('volumen_down')">🔉 Volumen -</button><br>
+  <button onclick="comando('f10')">🔘 F10</button>
 
   <script>
-    const CLAVE_CORRECTA = "1234"; // 🔐 Cambia esta clave según necesidad
-
-    function verificarClave() {
-      const claveIngresada = document.getElementById("clave").value;
-
-      if (claveIngresada === CLAVE_CORRECTA) {
-        document.getElementById("login-section").style.display = "none";
-        document.getElementById("control-section").style.display = "block";
-      } else {
-        const errorMsg = document.getElementById("error-clave");
-        errorMsg.style.display = "block";
-        setTimeout(() => {
-          errorMsg.style.display = "none";
-        }, 2000);
-      }
-    }
-
-    function enviarComando(comando) {
-      if (window.chrome && window.chrome.webview) {
-        window.chrome.webview.postMessage(comando);
-      } else {
-        alert('Esta página debe ejecutarse dentro de WebView2.');
-      }
-    }
-
-    if (window.chrome && window.chrome.webview) {
-      window.chrome.webview.addEventListener('message', function (event) {
-        if (event.data === 'foco_atrapado') {
-          const btn = document.getElementById('btnF12');
-          btn.style.backgroundColor = 'limegreen';
-          btn.innerText = '✅ Foco atrapado';
-          setTimeout(() => {
-            btn.innerText = '🎯 F12 - Atrapar foco';
-            btn.style.backgroundColor = 'gold';
-          }, 2000);
-        }
-      });
+    function comando(c) {
+      fetch(`http://192.168.1.16:5050/${c}`)
+ // Cambia a tu IP local
+        .then(() => console.log("OK"))
+        .catch(err => alert("❌ No se pudo conectar:\n" + err));
     }
   </script>
 </body>
